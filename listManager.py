@@ -1,14 +1,35 @@
 # ~~~~~ HELPER FUNCTIONS AND IMPORTS ~~~~~
 def loadList():
-    return []
+    try:
+        with open("savedList.txt", "r") as listIn:
+            loadedList = listIn.readlines()
+            for idx in range(len(loadedList)):
+                loadedList[idx] = loadedList[idx].replace("\n", "")
+        return loadedList
+    except FileNotFoundError:
+        return []
 
 
 def saveList(listIn):
-    pass
+    with open("savedList.txt", "w") as newSave:
+        for idx in range(len(listIn)):
+            if idx < len(listIn) - 1:
+                newSave.write(f"{listIn[idx]}\n")
+            else:
+                newSave.write(f"{listIn[idx]}")
 
 
 def addItems(listIn):
-    print("\nFunctionality coming soon!")
+    addMore = True
+    while addMore:
+        printList(listIn)
+        print("Enter an item to add (or 'done' to exit)")
+        toAdd = input(" --> ")
+        if toAdd == "done":
+            addMore = False
+        else:
+            listIn.append(toAdd)
+    saveList(listIn)
 
 
 def removeItems(listIn):
@@ -36,6 +57,12 @@ def printList(listIn):
 # ~~~~~ MAIN FUNCTION DEFINITION ~~~~~
 def main():
     appOn = True
+    options = {"1": printList,
+               "2": addItems,
+               "3": removeItems,
+               "4": editItems,
+               "5": moveItems}
+    
     print("Welcome to the List Manager!")
     while appOn:
         managedList = loadList()
@@ -48,19 +75,14 @@ def main():
         print("5. Move Items on List")
         print("6. Exit")
         toDo = input(" --> ")
-        if toDo == "1":
-            printList(managedList)
-        elif toDo == "2":
-            addItems(managedList)
-        elif toDo == "3":
-            removeItems(managedList)
-        elif toDo == "4":
-            editItems(managedList)
-        elif toDo == "5":
-            moveItems(managedList)
-        elif toDo == "6":
-            appOn = False
-        else:
+
+        try:
+            if toDo == "6":
+                appOn = False
+            else:
+                options[toDo](managedList)
+        except KeyError:
+            print("")
             print("Invalid option - try again!")
     
 
